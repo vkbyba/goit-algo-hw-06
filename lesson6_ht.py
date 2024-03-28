@@ -15,29 +15,29 @@ class Phone(Field):
     def __init__(self, phone_number):
         super().__init__(phone_number)
 
-    @staticmethod
-    def is_valid_phone_number(phone_number):
-        numeric_chars = [char for char in phone_number if char.isdigit()]
-        return len(numeric_chars) == 10
-
 class Record:
     def __init__(self, name):
         self.name = Name(name)
         self.phones = []
 
     def add_phone(self, phone_number):
-        if Phone.is_valid_phone_number(phone_number):
-            self.phones.append(Phone(phone_number))
+        if not (len(phone_number) == 10 and phone_number.isdigit()):
+            print(f"Invalid phone number: {phone_number}")
+            return
+        self.phones.append(Phone(phone_number))
 
-    def delete_phone(self, phone_number):
+    def remove_phone(self, phone_number):
         self.phones = [phone for phone in self.phones if phone.value != phone_number]
 
     def edit_phone(self, old_number, new_number):
-        if Phone.is_valid_phone_number(new_number):
-            for phone in self.phones:
-                if phone.value == old_number:
-                    phone.value = new_number
-                    break
+        if not (len(new_number) == 10 and new_number.isdigit()):
+            print(f"Invalid new phone number: {new_number}")
+            return
+        for phone in self.phones:
+            if phone.value == old_number:
+                phone.value = new_number
+                return
+        print(f"Old phone number {old_number} not found.")    
 
     def find_phone(self, phone_number):
         for phone in self.phones:
@@ -64,17 +64,17 @@ class AddressBook(UserDict):
 book = AddressBook()
 
 john_record = Record("John")
-john_record.add_phone("1234567890")
+john_record.add_phone('123456789A')
 john_record.add_phone("5555555555")
 
 
 book.add_record(john_record)
 
+print(john_record)
 
 jane_record = Record("Jane")
 jane_record.add_phone("9876543210")
 book.add_record(jane_record)
-
 
 
 
