@@ -13,6 +13,8 @@ class Name(Field):
 
 class Phone(Field):
     def __init__(self, phone_number):
+        if not (len(phone_number) == 10 and phone_number.isdigit()):
+            raise ValueError
         super().__init__(phone_number)
 
 class Record:
@@ -21,23 +23,24 @@ class Record:
         self.phones = []
 
     def add_phone(self, phone_number):
-        if not (len(phone_number) == 10 and phone_number.isdigit()):
-            print(f"Invalid phone number: {phone_number}")
-            return
-        self.phones.append(Phone(phone_number))
+        try:
+            self.phones.append(Phone(phone_number))
+        except ValueError as e:
+            return str(e)
 
     def remove_phone(self, phone_number):
         self.phones = [phone for phone in self.phones if phone.value != phone_number]
 
     def edit_phone(self, old_number, new_number):
-        if not (len(new_number) == 10 and new_number.isdigit()):
-            print(f"Invalid new phone number: {new_number}")
-            return
-        for phone in self.phones:
-            if phone.value == old_number:
-                phone.value = new_number
-                return
-        print(f"Old phone number {old_number} not found.")    
+        try:
+            new_phone = Phone(new_number)  
+            for phone in self.phones:
+                if phone.value == old_number:
+                    phone.value = new_phone.value
+                    return
+            return f"Old phone number {old_number} not found."
+        except ValueError as e:
+            return str(e) 
 
     def find_phone(self, phone_number):
         for phone in self.phones:
@@ -47,6 +50,7 @@ class Record:
 
     def __str__(self):
         return f"Contact name: {self.name.value}, phones: {'; '.join(phone.value for phone in self.phones)}"
+
 
 class AddressBook(UserDict):
     def add_record(self, record):
@@ -70,7 +74,6 @@ john_record.add_phone("5555555555")
 
 book.add_record(john_record)
 
-print(john_record)
 
 jane_record = Record("Jane")
 jane_record.add_phone("9876543210")
@@ -83,5 +86,5 @@ john_record.edit_phone("1234567890", "1112223333")
 
 
 found_phone = john.find_phone("5555555555")
-print(f"{john.name}: {found_phone}") 
+
 book.delete("Jane")
